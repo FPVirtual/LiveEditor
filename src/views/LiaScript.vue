@@ -46,6 +46,16 @@ import {
 
 import logoImg from "url:../../assets/logo.png";
 
+// FPVirtual fork, build-time configuration (see .env.example):
+// HIDE_GIT removes the Git integrations (Gist export, GitHub/GitLab sync)
+// from the share dialog — teachers save via the LMS button instead, so the
+// Git options would only confuse them (and they need a GitHub OAuth app
+// this instance does not provide).
+const HIDE_GIT = process.env.LIAEDIT_HIDE_GIT === "true";
+const HELP_URL =
+  process.env.LIAEDIT_HELP_URL ||
+  "https://liascript.github.io/course/?https://raw.githubusercontent.com/liaScript/docs/master/README.md";
+
 export default {
   name: "LiaScript",
 
@@ -81,6 +91,7 @@ export default {
 
     return {
       logoImg,
+      helpUrl: HELP_URL,
       DEVICE_GROUPS,
       RESPONSIVE,
       previewDevice: previewDevice.device,
@@ -373,7 +384,7 @@ export default {
 
       // links to earlier publications: only the ones that exist are listed
       const published: any[] = [];
-      if (this.gistLink)
+      if (this.gistLink && !HIDE_GIT)
         published.push({ id: "githubGistLink", icon: "bi-github", label: t("share.items.githubGistLink.label"), desc: t("share.items.githubGistLink.desc"), href: this.gistLink, action: t("share.actions.open") });
       if (this.nostrLink)
         published.push({ id: "nostrLink", icon: "bi-broadcast", label: t("share.items.nostrLink.label"), desc: t("share.items.nostrLink.desc"), href: this.nostrLink, action: t("share.actions.open") });
@@ -410,7 +421,9 @@ export default {
           sections: [
             {
               items: [
-                needsProject({ id: "githubGist", icon: "bi-github", label: t("share.items.githubGist.label"), desc: t("share.items.githubGist.desc"), tags: [tag.permanent, tag.githubAccount], tech: "Gist", action: t("share.actions.save"), primary: true }),
+                ...(HIDE_GIT
+                  ? []
+                  : [needsProject({ id: "githubGist", icon: "bi-github", label: t("share.items.githubGist.label"), desc: t("share.items.githubGist.desc"), tags: [tag.permanent, tag.githubAccount], tech: "Gist", action: t("share.actions.save"), primary: true })]),
                 { id: "nostr", icon: "bi-broadcast", label: t("share.items.nostr.label"), desc: t("share.items.nostr.desc"), tags: [tag.permanent, tag.noAccount], tech: "Nostr", action: t("share.actions.publish") },
                 { id: "dataUri", icon: "bi-link", label: t("share.items.dataUri.label"), desc: t("share.items.dataUri.desc"), tags: [tag.noAccount, tag.shortOnly], tech: "data-URI", action: t("share.actions.createLink") },
                 { id: "embedCode", icon: "bi-code-slash", label: t("share.items.embedCode.label"), desc: t("share.items.embedCode.desc"), tags: [tag.shortOnly], tech: "iframe", action: t("share.actions.createCode") },
@@ -423,17 +436,19 @@ export default {
             },
           ],
         },
-        {
-          id: "git",
-          icon: "bi-git",
-          label: t("share.groups.git.label"),
-          sub: t("share.groups.git.sub"),
-          intro: t("share.groups.git.intro"),
-          sections: [
-            { heading: "GitHub", items: repoItems("GitHub", "github", !!meta.github) },
-            { heading: "GitLab", items: repoItems("GitLab", "gitlab", !!meta.gitlab) },
-          ],
-        },
+        ...(HIDE_GIT
+          ? []
+          : [{
+              id: "git",
+              icon: "bi-git",
+              label: t("share.groups.git.label"),
+              sub: t("share.groups.git.sub"),
+              intro: t("share.groups.git.intro"),
+              sections: [
+                { heading: "GitHub", items: repoItems("GitHub", "github", !!meta.github) },
+                { heading: "GitLab", items: repoItems("GitLab", "gitlab", !!meta.gitlab) },
+              ],
+            }]),
       ];
 
       if (this.localFolderSupported) {
@@ -1224,7 +1239,7 @@ export default {
 
           <a
             class="btn btn-sm lia-bar-btn lia-icon-btn d-none d-sm-inline-flex"
-            href="https://liascript.github.io/course/?https://raw.githubusercontent.com/liaScript/docs/master/README.md"
+            :href="helpUrl"
             target="_blank"
             :title="$t('nav.help')"
             :aria-label="$t('nav.help')"
@@ -1273,7 +1288,7 @@ export default {
               <li class="d-sm-none">
                 <a
                   class="dropdown-item"
-                  href="https://liascript.github.io/course/?https://raw.githubusercontent.com/liaScript/docs/master/README.md"
+                  :href="helpUrl"
                   target="_blank"
                 >
                   <i class="bi bi-question-circle me-2" aria-hidden="true"></i>{{ $t('nav.help') }}

@@ -1,3 +1,57 @@
+# LiaEdit — fork FPVirtual
+
+Fork of [LiaScript/LiveEditor](https://github.com/LiaScript/LiveEditor) used
+as the editing front-end of the FPVirtual "Course as Code" platform
+(LiaScript + Moodle). Upstream README below; this section documents the
+fork's own changes.
+
+## What is different in this fork
+
+1. **Full Spanish translation**: `es.json` polished, welcome tutorial
+   (`tutorialEs` in `src/ts/Tutorial.ts`) and all snippet help translated
+   (`src/ts/Snippets.es.ts`), including the `lia-template-es` sample course.
+   Snippet help follows the UI language and reloads live on language change.
+2. **`liascript-lms` integration** (platform-agnostic): when a document
+   declares an LMS block in its LiaScript header, the editor can save back
+   to the learning platform:
+   - `?/open/file/:fileUrl` (`src/views/OpenFile.vue`): opens a remote
+     document as an editable project.
+   - `src/ts/lms/config.ts`: `extractLmsConfig()` reads and strips the
+     `liascript-lms` block (endpoints, file, branch, SHA, single-use
+     token, readonly flag, return URL).
+   - `src/ts/lms/LmsBridge.ts`: save/publish/token-refresh client with
+     optimistic locking (409 → resolution branch).
+   - `src/components/lms/LmsSaveBar.vue`: Save button (also Ctrl+S) and
+     Publish dropdown in the editor toolbar.
+   - `src/components/lms/LmsConflictModal.vue`: conflict resolution
+     (reload server version / keep my version / inspect diff).
+3. **Build-time flags** (see `.env.example`): `LIAEDIT_HIDE_GIT` hides the
+   GitHub/GitLab/Gist share options (teachers save via the LMS, no GitHub
+   OAuth needed), `LIAEDIT_HELP_URL` repoints the help link.
+
+## Build & deploy
+
+```bash
+npm install
+cp .env.example .env   # adjust to the deployment
+npm run build          # static site in dist/
+```
+
+Serve `dist/` over HTTPS (Nginx/Caddy). The PWA and the cross-origin
+`fetch` to the LMS both require a secure origin.
+
+## Maintenance
+
+`main` = upstream + fork patches. Rebase periodically against
+`LiaScript/LiveEditor:master`; fork code lives in `src/ts/lms/`,
+`src/components/lms/`, `src/views/OpenFile.vue`, `src/ts/Snippets.es.ts`
+and small, marked touchpoints (`src/index.ts`, `src/views/LiaScript.vue`,
+`src/views/File.vue`, `src/ts/importSources.ts`,
+`src/components/Editor.vue`, `src/ts/Tutorial.ts`, `src/ts/createProject.ts`,
+`src/i18n/`).
+
+---
+
 # LiaEdit
 
 Welcome to the official LiaScript collaborative editor, LiaEdit! This advanced editor runs entirely in your browser, offering unique capabilities beyond typical markdown editors.
