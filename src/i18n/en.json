@@ -772,5 +772,16 @@
     "embedIntro": "Paste this HTML code into your website. It shows the editor and the preview of the current file.",
     "embedNote": "Tip: replace “/embed/code/” in the address with “/embed/code/edit/” or “/embed/code/preview/” to show only the editor or only the preview.",
     "longLinkWarning": "Images and other files are not included, and very long links can be cut off by messengers or browsers. Test the link before you send it."
+  },
+  "lms": {
+    "openLoading": "Loading document…",
+    "openErrorTitle": "The document could not be loaded",
+    "backToLms": "Back to the course platform",
+    "reopenHint": "Open the document again from your learning platform.",
+    "openError": {
+      "forbidden": "Your editing link has expired or is no longer valid. Open the document again from your learning platform.",
+      "notfound": "The document was not found (404). Check the link with your platform administrator.",
+      "network": "The document could not be reached. Check your connection and try again."
+    }
   }
 }

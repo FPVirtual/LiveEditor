@@ -7,6 +7,7 @@ import Dexie from "./indexDB";
 import { navigateTo } from "../index";
 import { randomString, loadJSZip } from "./utils";
 import { getProjectDoc, handOffProjectDoc } from "./ProjectDoc";
+import type { LmsConfig } from "./lms/config";
 
 export interface ImportFile {
   /** Path inside the project, e.g. "README.md" or "img/logo.png". */
@@ -22,6 +23,9 @@ export interface ProjectMeta {
   github?: { owner: string; repo: string; branch: string; commitSha: string };
   gitlab?: { host: string; projectPath: string; branch: string; commitSha: string };
   localFolder?: { name: string };
+  /** LMS editing-session config, present when the project was opened from a
+   *  learning platform via the `liascript-lms` document block. */
+  lms?: LmsConfig;
 }
 
 /**
