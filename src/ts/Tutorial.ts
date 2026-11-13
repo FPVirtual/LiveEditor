@@ -249,6 +249,132 @@ Einfache Diagramme lassen sich mit Zeichen malen:
 </article>
 `
 
+export const tutorialEs = `<!--
+author:   LiaScript
+email:    LiaScript@web.de
+language: es
+comment:  Un breve recorrido por LiaEdit, el editor de LiaScript.
+
+classroom: disable
+-->
+
+# Bienvenido a LiaEdit
+
+Tu curso todavía está vacío, así que aquí tienes un breve recorrido.
+En cuanto escribas algo a la izquierda y actualices la vista previa, esta introducción desaparecerá.
+
+> **Conviene saber:**
+> Todo lo que escribes se guarda únicamente en este navegador.
+> Nada se envía a ningún servidor salvo que tú lo compartas o lo publiques.
+> Haz copias de seguridad de los cursos importantes desde **Compartir y exportar** – como ZIP, en una carpeta o en GitHub.
+
+<article>
+
+### 1. Escribir y actualizar
+
+Escribe Markdown a la izquierda.
+La vista previa no cambia a cada pulsación de tecla: así se ahorra capacidad de cálculo y se evitan mensajes de error mientras el código aún está incompleto.
+Pulsa **Actualizar** en la barra superior o <kbd>Ctrl</kbd> + <kbd>S</kbd>.
+
+Pruébalo – copia este ejemplo en el editor y actualiza:
+
+\`\`\`\` markdown
+# Mi primer curso
+
+¡Bienvenido! Esto es **LiaScript**.
+
+## Un pequeño cuestionario
+
+¿Cuánto es 2 + 2?
+
+- [( )] 3
+- [(X)] 4
+- [( )] 5
+
+## Código que puedes ejecutar
+
+\`\`\` javascript
+console.log("¡Hola LiaScript!");
+\`\`\`
+<script>@input</script>
+\`\`\`\`
+
+| Atajo                                  | Acción                        |
+| -------------------------------------- | ----------------------------- |
+| <kbd>Ctrl</kbd> + <kbd>S</kbd>         | Actualizar la vista previa    |
+| <kbd>Ctrl</kbd> + <kbd>Espacio</kbd>   | Mostrar sugerencias           |
+| <kbd>Ctrl</kbd> + <kbd>F</kbd>         | Buscar en el documento        |
+| <kbd>Tab</kbd> (dentro de una tabla)   | Dejar la tabla bien alineada  |
+| <kbd>F1</kbd>                          | Abrir la paleta de comandos   |
+
+### 2. Ayuda mientras escribes
+
+No hace falta memorizar la sintaxis de LiaScript:
+
+- Escribe \`lia\` para obtener bloques como cuestionarios, encuestas, animaciones o diapositivas.
+- Escribe \`voice\` para elegir una voz para la lectura en voz alta.
+- Escribe \`hili\` seguido de un lenguaje para colorear el código.
+
+Elige con las flechas e inserta con <kbd>Tab</kbd> o <kbd>Enter</kbd>.
+Los elementos más habituales también son botones de la barra de herramientas sobre el editor.
+La pestaña **Tutorial** de esa barra inserta plantillas completas.
+
+### 3. Saltar entre el texto y la vista previa
+
+- **Vista previa → texto:** haz doble clic en un elemento de la vista previa y el editor salta a su línea.
+- **Texto → vista previa:** mantén <kbd>Ctrl</kbd> y haz doble clic en una palabra del editor, y la vista previa abre esa diapositiva.
+
+### 4. Archivos, imágenes y medios
+
+El símbolo de la carpeta en el borde izquierdo abre el panel de archivos.
+Ahí puedes añadir imágenes, audio, vídeo y más archivos Markdown.
+Refiérete a ellos con una ruta relativa, por ejemplo \`![Logo](img/logo.png)\`.
+El archivo con el símbolo de la casa es el inicio de tu curso.
+
+### 5. Trabajar en equipo
+
+El botón **Solo yo** de la barra superior muestra quién está escribiendo.
+Cambia a **En vivo – directo** o **En vivo – por servidor** y comparte el enlace: todos ven los cambios al instante.
+Todos los que tienen el enlace editan el mismo curso.
+Para tener tu propia versión, usa **Hacer una copia** en el menú ⋮.
+
+### 6. Compartir, publicar, exportar
+
+**Compartir y exportar** reúne todo lo que puedes hacer con tu curso:
+
+- enlaces para el alumnado – como GitHub Gist, en Nostr o con el curso dentro del propio enlace,
+- sincronización con GitHub, GitLab o una carpeta de tu ordenador,
+- descarga en ZIP y conversión a SCORM, IMS, PDF o ePub con el LiaScript Exporter.
+
+### Dibujar con texto
+
+Los diagramas sencillos se pueden dibujar con caracteres:
+
+\`\`\`\` markdown
+\`\`\` ascii
++------+   +-------+   +--------+
+|      |   |       |   |        |
+| Idea +-->| Texto +-->|  Curso |
+|      |   |       |   |        |
++------+   +-------+   +--------+
+\`\`\`
+\`\`\`\`
+
+### Más información
+
+- Documentación: https://liascript.github.io/course/?https://raw.githubusercontent.com/liaScript/docs/master/README.md
+- Web y blog: https://liascript.github.io
+- Plantillas: https://github.com/topics/liascript-template
+- Cursos publicados: https://github.com/topics/liascript-course
+- Código fuente: https://github.com/liascript
+- Vídeos: https://www.youtube.com/channel/UCyiTe2GkW_u05HSdvUblGYg
+- Contacto: LiaScript@web.de o el chat en https://gitter.im/LiaScript/community
+
+</article>
+`
+
 export function tutorialFor(locale: string): string {
-  return locale === "de" ? tutorialDe : tutorial
+  if (locale === "de") return tutorialDe
+  if (locale === "es") return tutorialEs
+  return tutorial
 }

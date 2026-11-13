@@ -19,12 +19,13 @@ import type { EditorConfig } from "../ts/utils";
 import EditorSettingsTab from "./EditorSettingsTab.vue";
 import { navigateTo } from "../index";
 import { tutorialFor } from "../ts/Tutorial";
+import { i18n } from "../i18n/index";
 
 // import * as MATHJS from "mathjs";
 import { TableEditor, options, Point, Range } from "@susisu/mte-kernel";
 import TextEditorInterface from "../ts/TextEditorInterface";
 
-import { defineAsyncComponent } from "vue";
+import { defineAsyncComponent, watch } from "vue";
 // Recorder (webcam/desktop capture, incl. its media stream code) is only shown
 // behind a v-if when the user starts a recording, so it is loaded on demand to
 // keep it out of the editor's startup bundle.
@@ -49,7 +50,18 @@ var Snippets: Array<{
   range: any;
   command: { id: string };
 }> = [];
-import("../ts/Snippets.ts").then((module) => {
+
+// Snippet help (Monaco autocomplete) is localized: Spanish UI gets
+// Snippets.es.ts, every other language the original English file. The
+// collection is refilled in place so the completion provider (registered
+// once with the shared array) picks up the new language without a reload.
+async function loadSnippets(locale: string) {
+  const module =
+    locale === "es"
+      ? await import("../ts/Snippets.es.ts")
+      : await import("../ts/Snippets.ts");
+
+  Snippets.length = 0;
   for (const snippet of module.Snippets) {
     Snippets.push({
       label: snippet.label,
@@ -62,7 +74,13 @@ import("../ts/Snippets.ts").then((module) => {
       },
     });
   }
-});
+}
+
+loadSnippets((i18n.global as any).locale);
+watch(
+  () => (i18n.global as any).locale,
+  (locale: string) => loadSnippets(locale)
+);
 
 var Editor: any;
 var tableEditor: any;
