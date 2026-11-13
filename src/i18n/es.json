@@ -772,5 +772,16 @@
     "embedIntro": "Pega este código HTML en tu sitio web. Muestra el editor y la vista previa del archivo actual.",
     "embedNote": "Consejo: sustituye «/embed/code/» en la dirección por «/embed/code/edit/» o «/embed/code/preview/» para mostrar solo el editor o solo la vista previa.",
     "longLinkWarning": "Las imágenes y otros archivos no se incluyen, y los enlaces muy largos pueden quedar cortados en apps de mensajería o navegadores. Prueba el enlace antes de enviarlo."
+  },
+  "lms": {
+    "openLoading": "Cargando documento…",
+    "openErrorTitle": "No se pudo cargar el documento",
+    "backToLms": "Volver a la plataforma del curso",
+    "reopenHint": "Vuelve a abrir el documento desde tu plataforma de aprendizaje.",
+    "openError": {
+      "forbidden": "Tu enlace de edición ha caducado o ya no es válido. Vuelve a abrir el documento desde tu plataforma de aprendizaje.",
+      "notfound": "No se encontró el documento (404). Comprueba el enlace con la administración de tu plataforma.",
+      "network": "No se pudo acceder al documento. Comprueba tu conexión e inténtalo de nuevo."
+    }
   }
 }
