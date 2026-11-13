@@ -6,6 +6,7 @@ import Editor from "../components/Editor.vue";
 import FileExplorer from "../components/FileExplorer.vue";
 import Preview from "../components/Preview.vue";
 import Modal from "../components/Modal.vue";
+import LmsSaveBar from "../components/lms/LmsSaveBar.vue";
 import LanguageDropdown from "../components/LanguageDropdown.vue";
 import ImportMenu from "../components/ImportMenu.vue";
 import ShareModal from "../components/ShareModal.vue";
@@ -139,11 +140,13 @@ export default {
 
   unmounted() {
     window.removeEventListener("resize", this.onResize);
+    window.removeEventListener("keydown", this.onLmsKeydown);
     this.unwatch?.();
   },
 
   mounted() {
     window.addEventListener("resize", this.onResize);
+    window.addEventListener("keydown", this.onLmsKeydown);
 
     // Opened straight from the index page's "local folder" import: pop the sync
     // dialog so the user can pull the folder's files into the fresh project.
@@ -182,6 +185,12 @@ export default {
     // basename of the active file (shown on the download menu entry)
     activeFileName(): string {
       return this.activeFilePath.split("/").pop() || this.activeFilePath;
+    },
+
+    // LMS editing-session config, present when the project was opened from a
+    // learning platform (?/open/file/... with a liascript-lms document block)
+    lmsConfig(): any {
+      return (this.meta as any)?.meta?.lms;
     },
 
     courseTitle(): string {
@@ -479,6 +488,51 @@ export default {
   },
 
   methods: {
+    // --- LMS integration (save back to the learning platform) ---------------
+    getMainContent(): string {
+      return this.$refs.editor ? (this.$refs.editor as any).getMainValue() : "";
+    },
+
+    // Persist SHA/token changes reported by the LmsBridge into the project
+    // meta (read-merge-write in Dexie, so the whole lms object is replaced)
+    persistLmsMeta(patch: any) {
+      if (!this.$props.storageId) return;
+      const lms = { ...((this.meta as any)?.meta?.lms || {}), ...patch };
+      this.database?.put(this.$props.storageId, { lms });
+    },
+
+    onLmsConflict(info: any) {
+      this.$refs.modal.show({
+        title: this.$t("lms.conflictTitle"),
+        intro: this.$t("lms.conflictNote"),
+        entries: info.diffUrl
+          ? [
+              {
+                value: info.diffUrl,
+                kind: "link",
+                label: this.$t("lms.viewDiff"),
+              },
+            ]
+          : [],
+        note: info.resolutionBranch
+          ? this.$t("lms.conflictBranch", { branch: info.resolutionBranch })
+          : undefined,
+      });
+    },
+
+    // Ctrl+S compiles (handled by the editor); with an LMS session it also
+    // saves back to the platform
+    onLmsKeydown(e: KeyboardEvent) {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === "s" &&
+        this.lmsConfig &&
+        !this.lmsConfig.readonly
+      ) {
+        (this.$refs.lmsSaveBar as any)?.save();
+      }
+    },
+
     devicesIn(group: string) {
       return DEVICES.filter((d) => d.group === group);
     },
@@ -953,6 +1007,7 @@ export default {
   components: {
     Editor,
     FileExplorer,
+    LmsSaveBar,
     Modal,
     Pane,
     Preview,
@@ -1060,6 +1115,14 @@ export default {
       <!-- right: what can I do -->
       <div class="lia-editbar-side lia-editbar-right d-flex align-items-center justify-content-end">
         <template v-if="!embed">
+          <LmsSaveBar
+            v-if="lmsConfig"
+            ref="lmsSaveBar"
+            :lms="lmsConfig"
+            :get-content="getMainContent"
+            :persist="persistLmsMeta"
+            @conflict="onLmsConflict"
+          />
           <div class="dropdown">
             <button
               type="button"

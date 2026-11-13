@@ -782,6 +782,20 @@
       "forbidden": "Your editing link has expired or is no longer valid. Open the document again from your learning platform.",
       "notfound": "The document was not found (404). Check the link with your platform administrator.",
       "network": "The document could not be reached. Check your connection and try again."
-    }
+    },
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "retry": "Retry",
+    "publish": "Publish",
+    "publishing": "Publishing…",
+    "published": "Published",
+    "readonlyBadge": "Read-only",
+    "branchInfo": "Branch {branch} · {sha}",
+    "authError": "Session expired — reopen the document from your platform.",
+    "conflictTitle": "The document changed on the server",
+    "conflictNote": "Someone saved a newer version while you were editing. Your changes were kept safe on a resolution branch — nothing is lost.",
+    "conflictBranch": "Your changes are on branch: {branch}",
+    "viewDiff": "Open the differences"
   }
 }
