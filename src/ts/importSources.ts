@@ -69,12 +69,23 @@ async function filesFromSingle(
   return [{ path: name.replace(/^.*\//, ""), bytes }];
 }
 
-/** Create a project from the built-in sample course, in German when the UI is
- *  German, otherwise in English. Snippets.ts is large, so it is loaded lazily. */
+/** Create a project from the built-in sample course, in the UI language when
+ *  a translation exists (German, Spanish), otherwise in English.
+ *  Snippets.ts is large, so it is loaded lazily. */
 async function createFromTemplate() {
-  const { Snippets } = await import("./Snippets");
-  const label = (i18n.global as any).locale === "de" ? "lia-template-de" : "lia-template";
-  const template = Snippets.find((s: any) => s.label === label)?.insertText || "";
+  const locale = (i18n.global as any).locale;
+  const label =
+    locale === "de"
+      ? "lia-template-de"
+      : locale === "es"
+        ? "lia-template-es"
+        : "lia-template";
+  const module =
+    locale === "es"
+      ? await import("./Snippets.es")
+      : await import("./Snippets");
+  const template =
+    module.Snippets.find((s: any) => s.label === label)?.insertText || "";
   const bytes = new TextEncoder().encode(template);
   await createProjectFromFiles([{ path: "README.md", bytes, mime: "text/markdown" }]);
 }

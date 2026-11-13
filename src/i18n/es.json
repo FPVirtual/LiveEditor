@@ -364,7 +364,7 @@
     "import": {
       "title": "Importar desde GitHub",
       "repoLabel": "Repositorio",
-      "repoPlaceholder": "owner/repo or https://github.com/owner/repo",
+      "repoPlaceholder": "usuario/repo o https://github.com/usuario/repo",
       "repoHint": "Los repositorios públicos se pueden importar sin token.",
       "load": "Cargar",
       "loadingRepo": "Cargando repositorio…",
@@ -711,8 +711,8 @@
     "labelFolder": "carpeta (y su contenido)",
     "deleteConfirm": "¿Eliminar {label} \"{path}\"?",
     "exists": "«{path}» ya existe.",
-    "newFileDefault": "untitled.txt",
-    "newFolderDefault": "folder"
+    "newFileDefault": "sin-titulo.txt",
+    "newFolderDefault": "carpeta"
   },
   "exporter": {
     "title": "Convertir para una plataforma de aprendizaje",
