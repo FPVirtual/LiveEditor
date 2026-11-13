@@ -1,10 +1,18 @@
-name: build
+name: build & deploy
 
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Only one deployment at a time
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -19,8 +27,8 @@ jobs:
 
       - run: npm ci --no-audit --no-fund
 
-      # The build needs the deployment configuration; the workflow uses the
-      # reference values from .env.example (LIAEDIT_HIDE_GIT=true, no OAuth).
+      # The build uses the fork's reference configuration
+      # (LIAEDIT_HIDE_GIT=true, no GitHub OAuth)
       - run: cp .env.example .env
 
       - run: npm run build
@@ -30,3 +38,26 @@ jobs:
           name: liveeditor-dist
           path: dist/
           retention-days: 14
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: liveeditor-dist
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        id: deployment
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: docs
+          publish_branch: gh-pages
