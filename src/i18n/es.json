@@ -796,6 +796,11 @@
     "conflictTitle": "El documento cambió en el servidor",
     "conflictNote": "Alguien guardó una versión más reciente mientras editabas. Tus cambios están a salvo en una rama de resolución: no se ha perdido nada.",
     "conflictBranch": "Tus cambios están en la rama: {branch}",
-    "viewDiff": "Abrir las diferencias"
+    "viewDiff": "Abrir las diferencias",
+    "conflictCancel": "Cancelar",
+    "conflictReload": "Cargar la versión del servidor",
+    "conflictForce": "Mantener mi versión",
+    "conflictHint": "Cargar la versión del servidor descarta tus cambios locales (permanecen en la rama de resolución). Mantener tu versión sobrescribe la más reciente del servidor.",
+    "reloadError": "No se pudo cargar la versión del servidor. Comprueba tu conexión e inténtalo de nuevo."
   }
 }

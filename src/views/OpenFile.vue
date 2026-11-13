@@ -56,6 +56,7 @@ export default {
 
     const extracted = extractLmsConfig(markdown);
     lms = extracted.lms;
+    if (lms) lms.source_url = this.fileUrl as string;
     this.returnUrl = lms?.return_url;
 
     try {

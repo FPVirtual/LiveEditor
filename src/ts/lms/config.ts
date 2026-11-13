@@ -42,6 +42,9 @@ export interface LmsConfig {
   readonly: boolean;
   /** Where to send the user back to (course catalog in the LMS). */
   return_url?: string;
+  /** URL the document was opened from — set by the editor itself on open
+   *  (not part of the injected block), used to reload the server version. */
+  source_url?: string;
 }
 
 export interface ExtractedLms {

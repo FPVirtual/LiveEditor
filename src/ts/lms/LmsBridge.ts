@@ -39,6 +39,12 @@ export class LmsBridge {
     return this.cfg;
   }
 
+  /** Swap the underlying config (e.g. when the persisted meta is updated
+   *  externally, the bridge must follow the freshest object). */
+  updateConfig(cfg: LmsConfig) {
+    this.cfg = cfg;
+  }
+
   canSave(): boolean {
     return !this.cfg.readonly && !!this.cfg.token;
   }

@@ -29,7 +29,28 @@ export default {
       publishFormats: PUBLISH_FORMATS,
       errorMessage: "",
       stateTimer: undefined as ReturnType<typeof setTimeout> | undefined,
+      refreshTimer: undefined as ReturnType<typeof setInterval> | undefined,
     };
+  },
+  watch: {
+    // The persisted meta can be replaced externally (conflict flow); the
+    // bridge must always work with the freshest config object
+    lms(newLms: LmsConfig) {
+      this.bridge.updateConfig(newLms);
+    },
+  },
+  mounted() {
+    // The editing token is single-use and short-lived: renew it periodically
+    // while the editor is open (no-op without token_refresh_endpoint)
+    this.refreshTimer = setInterval(() => {
+      if (this.canSave && !document.hidden) {
+        this.bridge.refreshToken();
+      }
+    }, 10 * 60 * 1000);
+  },
+  unmounted() {
+    clearInterval(this.refreshTimer);
+    clearTimeout(this.stateTimer);
   },
   computed: {
     canSave(): boolean {

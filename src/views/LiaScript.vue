@@ -7,6 +7,7 @@ import FileExplorer from "../components/FileExplorer.vue";
 import Preview from "../components/Preview.vue";
 import Modal from "../components/Modal.vue";
 import LmsSaveBar from "../components/lms/LmsSaveBar.vue";
+import LmsConflictModal from "../components/lms/LmsConflictModal.vue";
 import LanguageDropdown from "../components/LanguageDropdown.vue";
 import ImportMenu from "../components/ImportMenu.vue";
 import ShareModal from "../components/ShareModal.vue";
@@ -100,6 +101,7 @@ export default {
       database,
       meta: {},
       onlineUsers: 0,
+      lmsConflictBusy: false,
       conn: {
         type: connectionType,
         users: 0,
@@ -502,22 +504,61 @@ export default {
     },
 
     onLmsConflict(info: any) {
-      this.$refs.modal.show({
-        title: this.$t("lms.conflictTitle"),
-        intro: this.$t("lms.conflictNote"),
-        entries: info.diffUrl
-          ? [
-              {
-                value: info.diffUrl,
-                kind: "link",
-                label: this.$t("lms.viewDiff"),
-              },
-            ]
-          : [],
-        note: info.resolutionBranch
-          ? this.$t("lms.conflictBranch", { branch: info.resolutionBranch })
-          : undefined,
-      });
+      (this.$refs.lmsConflictModal as any)?.open(info);
+    },
+
+    // Reload the version currently on the server, discarding local changes.
+    // The fresh document brings a new injected block (new SHA, renewed token)
+    async lmsConflictReload() {
+      const lms = this.lmsConfig;
+      if (!lms?.source_url || this.lmsConflictBusy) return;
+      this.lmsConflictBusy = true;
+      try {
+        const { extractLmsConfig } = await import("../ts/lms/config");
+        const { replaceURLs, replaceMacroURLs } = await import(
+          "../ts/urlRewrite"
+        );
+
+        const response = await fetch(lms.source_url);
+        if (!response.ok) throw new Error(String(response.status));
+
+        let markdown = await response.text();
+        const baseURL = lms.source_url.replace(/\/[^\/]*$/, "/");
+        markdown = replaceURLs(baseURL, markdown);
+        markdown = replaceMacroURLs("script", baseURL, markdown);
+        markdown = replaceMacroURLs("link", baseURL, markdown);
+
+        const { lms: freshLms, strippedMarkdown } = extractLmsConfig(markdown);
+        (this.$refs.editor as any).setMainValue(strippedMarkdown);
+
+        if (freshLms) {
+          freshLms.source_url = lms.source_url;
+          this.database?.put(this.$props.storageId, { lms: freshLms });
+        }
+        (this.$refs.lmsConflictModal as any)?.close();
+      } catch (e) {
+        console.warn(e);
+        this.$refs.modal.show({
+          title: this.$t("lms.conflictTitle"),
+          intro: this.$t("lms.reloadError"),
+          entries: [],
+        });
+      }
+      this.lmsConflictBusy = false;
+    },
+
+    // Keep my version on top of the new server head: adopt the SHA the
+    // conflict reported and retry the save
+    async lmsConflictForce() {
+      const modal = this.$refs.lmsConflictModal as any;
+      const currentSha = modal?.info?.currentSha;
+      modal?.close();
+      if (currentSha) {
+        this.persistLmsMeta({ sha: currentSha });
+        // let the updated meta reach the save bar's bridge first
+        await this.$nextTick();
+      }
+      (this.$refs.lmsSaveBar as any)?.save();
     },
 
     // Ctrl+S compiles (handled by the editor); with an LMS session it also
@@ -1007,6 +1048,7 @@ export default {
   components: {
     Editor,
     FileExplorer,
+    LmsConflictModal,
     LmsSaveBar,
     Modal,
     Pane,
@@ -1431,6 +1473,13 @@ export default {
   </div>
 
   <Modal ref="modal" />
+  <LmsConflictModal
+    v-if="lmsConfig"
+    ref="lmsConflictModal"
+    :busy="lmsConflictBusy"
+    @reload="lmsConflictReload"
+    @force="lmsConflictForce"
+  />
   <ShareModal ref="shareModal" :groups="shareGroups" :course-title="storageId ? courseTitle : ''" @action="onShareAction" />
   <NostrModal
     ref="nostrModal"

@@ -431,6 +431,13 @@ export default {
       if (Editor) Editor.focus();
     },
 
+    // Replace the main document's content; the Yjs binding propagates the
+    // change to Monaco. Used by the LMS conflict flow to reload the version
+    // currently on the server.
+    setMainValue(text: string) {
+      this.projectDoc?.setText(this.projectDoc.getMainPath(), text);
+    },
+
     // Open a file from the explorer: text files become editable, images are
     // displayed, everything else shows a download hint.
     openPath(path: string, mime?: string) {
